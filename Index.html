@@ -1,0 +1,3294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- 1. MATERIAL DESIGN VARIABLES & RESET --- */
+        :root {
+            /* Branding Colors */
+            --primary-navy: #0e2442;
+            --primary-blue: #1976d2;
+            --branding-magenta: #b32878;
+            --accent-red: #d32f2f;
+
+            /* Backgrounds */
+            --light-bg: #f5f5f5;
+            --white: #ffffff;
+            --surface: #ffffff;
+
+            /* UI Elements */
+            --border-color: #e0e0e0;
+            --tab-bg: #fafafa;
+            --tab-width: 48px;
+            --panel-width: 320px;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+
+            /* Shadows (Elevation) */
+            --shadow-1: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+            --shadow-2: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+            --shadow-3: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+
+            --radius: 8px;
+
+            /* Theme Designer Specifics */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--light-bg);
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-primary);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 2. LAYOUT: SIDEBAR (Navigation Drawer) --- */
+        .sidebar {
+            width: 72px;
+            background-color: var(--primary-navy);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            color: white;
+            z-index: 200;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-2);
+        }
+
+        .sidebar-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            cursor: pointer;
+            opacity: 0.7;
+            border-radius: 50%;
+            transition: background-color 0.2s, opacity 0.2s, color 0.2s;
+            position: relative;
+        }
+
+        .sidebar-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .sidebar-icon.active {
+            opacity: 1;
+            color: #fff;
+            background-color: var(--branding-magenta);
+            box-shadow: var(--shadow-1);
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* --- HEADER (App Bar) --- */
+        .top-header {
+            background-color: var(--primary-navy);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-2);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 1.0rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .header-right i {
+            cursor: pointer;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .header-right i:hover {
+            opacity: 1;
+        }
+
+        /* --- SECONDARY NAV (Tabs) --- */
+        .secondary-nav {
+            background-color: var(--surface);
+            padding: 0 24px;
+            height: 50px;
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            flex-shrink: 0;
+            justify-content: space-between;
+            box-shadow: var(--shadow-1);
+            z-index: 90;
+        }
+
+        .nav-items-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            height: 32px;
+            padding: 0 16px;
+            border-radius: 18px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: rgba(0, 0, 0, 0.04);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            color: white;
+            background-color: var(--branding-magenta);
+            font-weight: 600;
+            box-shadow: var(--shadow-1);
+        }
+
+        /* --- SEARCH FIELD (Outlined) --- */
+        .smart-search-wrapper {
+            width: 320px;
+            display: flex;
+            align-items: center;
+        }
+
+        .smart-search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .smart-search-input {
+            width: 100%;
+            padding: 10px 40px 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.80rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        .smart-search-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        .smart-search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        /* --- SELECTION BAR (Contextual Header) --- */
+        .selection-summary-bar {
+            background-color: var(--surface);
+            padding: 0 24px;
+            height: 45px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 80;
+        }
+
+        /* === BREADCRUMB NAVIGATION === */
+        .navigation-breadcrumb-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .breadcrumb-link {
+            cursor: pointer;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-link:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+
+        .breadcrumb-separator {
+            font-size: 0.75rem;
+            color: #bdbdbd;
+        }
+
+        .breadcrumb-current {
+            color: var(--branding-magenta);
+            font-weight: 500;
+            cursor: default;
+        }
+
+        .header-star {
+            font-size: 1rem;
+            color: #bdbdbd;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 4px;
+            border-radius: 50%;
+            margin-left: -4px;
+        }
+
+        .header-star:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .header-star.active {
+            color: #fbc02d;
+        }
+
+        /* Material Chips */
+        .summary-chips-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            padding-left: 16px;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .summary-chip {
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid #bdbdbd;
+            border-radius: 20px;
+            padding: 2px 10px 2px 2px;
+            height: 32px;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 260px;
+        }
+
+        .summary-chip:hover {
+            background-color: #fafafa;
+            border-color: #9e9e9e;
+        }
+
+        .chip-icon-circle {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(179, 40, 120, 0.1);
+            color: var(--branding-magenta);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .chip-icon-circle.purple {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .chip-text-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.1;
+        }
+
+        .chip-label {
+            font-size: 0.55rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chip-value {
+            font-size: 0.7rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .chip-close {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding: 2px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .chip-close:hover {
+            background-color: #ffebee;
+            color: var(--accent-red);
+        }
+
+        .chip-arrow {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .summary-right-actions {
+            margin-left: auto;
+        }
+
+        .btn-reset-text {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-reset-text:hover {
+            background-color: rgba(25, 118, 210, 0.04);
+        }
+
+        /* Filter Popover */
+        .filter-popover {
+            display: none;
+            position: absolute;
+            top: 48px;
+            right: 24px;
+            background: white;
+            border: none;
+            box-shadow: var(--shadow-3);
+            z-index: 1000;
+            padding: 20px;
+            border-radius: 4px;
+            min-width: 280px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .popover-section {
+            margin-bottom: 16px;
+        }
+
+        .popover-header {
+            font-weight: 500;
+            color: var(--primary-blue);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .popover-item {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+        }
+
+        /* --- DASHBOARD BODY --- */
+        .dashboard-body {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .canvas-area {
+            flex: 1;
+            padding: 24px 32px;
+            overflow: auto;
+            background-color: transparent;
+            margin: 0;
+            border: none;
+            position: relative;
+        }
+
+        /* --- GRID LAYOUT & MATERIAL CARDS --- */
+        .my-reports-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            row-gap: 16px;
+            align-items: start;
+            justify-items: center;
+            width: 100%;
+            padding-bottom: 60px;
+        }
+
+        @media (max-width: 1600px) {
+            .my-reports-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 1300px) {
+            .my-reports-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .my-reports-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .my-reports-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .report-group {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: none;
+            padding: 10px;
+            box-shadow: var(--shadow-1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .report-group:hover {
+            box-shadow: var(--shadow-2);
+        }
+
+        .report-group-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            padding-left: 10px;
+            border-left: 4px solid var(--accent-red);
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .report-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .report-link-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 4px 6px;
+            background-color: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+            width: 100%;
+        }
+
+        .report-link-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .report-link-item:active {
+            background-color: #eeeeee;
+        }
+
+        .report-link-item:hover .report-link-text {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        .report-icon-box {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            margin-top: 1px;
+            color: #78909c;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .report-icon-box i {
+            color: #546e7a;
+        }
+
+        .report-link-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            line-height: 1.4;
+            flex: 1;
+            transition: color 0.2s;
+        }
+
+        /* --- RIGHT PANEL (Side Sheet) --- */
+        .right-panel-container {
+            display: flex;
+            background-color: var(--surface);
+            border-left: 1px solid var(--border-color);
+            height: 100%;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .tree-side-tab {
+            width: 0;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f7fa 100%);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tree-side-tab.expanded {
+            width: 290px;
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .side-tab-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 5;
+        }
+
+        .side-tab-close:hover {
+            color: var(--accent-red);
+        }
+
+        .vertical-tabs {
+            width: 37px;
+            background-color: #fff;
+            border-right: 1px solid var(--border-color);
+            display: none;
+            flex-direction: column;
+            padding-top: 5px;
+            align-items: center;
+        }
+
+        .v-tab {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 15px 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            width: 100%;
+            text-align: center;
+            border-left: 3px solid transparent;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .v-tab.active {
+            background-color: rgba(14, 36, 66, 0.04);
+            color: var(--primary-navy);
+            border-left: 3px solid var(--primary-navy);
+        }
+
+        .panel-content-wrapper {
+            width: 0;
+            background-color: #fff;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .panel-content-wrapper.open {
+            width: var(--panel-width);
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            font-size: .9rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .panel-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            min-width: var(--panel-width);
+            padding-bottom: 90px;
+        }
+
+        .grouped-selection-box {
+            border: 1px solid #e3f2fd;
+            border-radius: var(--radius);
+            background-color: #e3f2fd;
+            padding: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .tile-block {
+            padding: 5px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            margin-bottom: 16px;
+            box-shadow: none;
+        }
+
+        .sort-block {
+            background-color: #e8f5e9;
+            border-color: #c8e6c9;
+        }
+
+        .data-block {
+            background-color: #f3e5f5;
+            border-color: #e1bee7;
+        }
+
+        .theme-block {
+            background-color: #e8eaf6;
+            border-color: #c5cae9;
+        }
+
+        .grouped-selection-box .tile-block {
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 0;
+            margin-bottom: 0;
+            padding: 8px 4px 5px 4px;
+            background: transparent;
+        }
+
+        .grouped-selection-box .tile-block:last-child {
+            border-bottom: none;
+        }
+
+        .section-title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .modern-tile-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 1px;
+        }
+
+        .modern-tile {
+            background: #fff;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            width: fit-content;
+            transition: all 0.2s ease;
+        }
+
+        .modern-tile:hover {
+            border-color: var(--branding-magenta);
+            box-shadow: 0 4px 8px rgba(179, 40, 120, 0.1);
+        }
+
+        .modern-tile i {
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: 0.2s;
+        }
+
+        .modern-tile i:hover {
+            color: var(--accent-red);
+        }
+
+        .placeholder-text {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.62rem;
+            margin-top: 4px;
+            cursor: pointer;
+        }
+
+        /* Tree & Search */
+        .search-container {
+            position: relative;
+            margin-bottom: 14px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .tree-search {
+            width: 100%;
+            padding: 8px 36px 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.80rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .tree-search:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 1px var(--primary-blue);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .loc-tree {
+            list-style: none;
+            font-size: 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .loc-tree-node {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+
+        .loc-tree-node:hover {
+            background: #e3f2fd;
+        }
+
+        .loc-tree-node input[type="checkbox"] {
+            cursor: pointer;
+            width: 14px;
+            height: 14px;
+            accent-color: var(--primary-blue);
+        }
+
+        .loc-tree ul {
+            list-style: none;
+            padding-left: 24px;
+            border-left: 1px dashed #e0e0e0;
+            display: none;
+            margin-top: 4px;
+        }
+
+        .loc-tree ul.show {
+            display: block;
+        }
+
+        /* --- ROLLUP RADIO GROUP --- */
+        .rollup-toggle-container {
+            display: none;
+            padding: 0 0 12px 0;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+            padding: 4px 8px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .radio-label input {
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Date Inputs */
+        .sidebar-date-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .date-field {
+            flex: 1;
+            position: relative;
+        }
+
+        .date-field label {
+            display: block;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .date-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        .date-field input:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+        }
+
+        .date-field input[type="date"] {
+            position: absolute;
+            left: 0;
+            top: 24px;
+            width: 100%;
+            height: 38px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .date-field i {
+            position: absolute;
+            right: 12px;
+            bottom: 10px;
+            color: var(--text-secondary);
+            z-index: 1;
+        }
+
+        .date-links-grid {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            row-gap: 10px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+
+        .date-cat-label {
+            font-weight: 500;
+            color: var(--primary-navy);
+            cursor: pointer;
+        }
+
+        .date-cat-label:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+
+        .date-actions {
+            display: flex;
+            gap: 16px;
+            color: var(--primary-blue);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .date-actions span:hover {
+            text-decoration: underline;
+        }
+
+        .sidebar-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+        }
+
+        .sidebar-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            transition: all 0.25s ease-in-out;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            background-color: transparent;
+        }
+
+        .sidebar-list-item:hover {
+            background-color: rgba(25, 118, 210, 0.05);
+            transform: translateX(4px);
+        }
+
+        /* Specialized sidebar colors */
+        .sidebar-list-item.type-default {
+            background-color: #f0fdf4 !important; /* Light Green */
+            border-left: 4px solid #4caf50;
+        }
+        
+        .sidebar-list-item.type-custom {
+            background-color: #f5f3ff !important; /* Light Purple/Grey */
+        }
+
+        .sidebar-list-item.selected {
+            background-color: #e3f2fd !important; /* Light Blue selection highlight */
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .sidebar-list-item.selected.type-default {
+            border-left: 4px solid var(--primary-blue); /* Selection overrides default border color but keeps background */
+        }
+
+        .sidebar-list-item input {
+            margin-right: 12px;
+            accent-color: var(--primary-blue);
+        }
+
+        .info-panel {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            border-radius: 4px;
+            background: #fff;
+            margin-top: 15px;
+            line-height: 1.2;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .data-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-item:hover {
+            background: #e3f2fd;
+            color: var(--primary-blue);
+        }
+
+        .tile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            padding: 5px 12px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            cursor: grab;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            flex-wrap: nowrap;
+        }
+
+        .tile-row:active {
+            cursor: grabbing;
+            box-shadow: var(--shadow-1);
+        }
+
+        .drag-handle-container {
+            display: flex;
+            align-items: center;
+            padding-right: 8px;
+            margin-right: 8px;
+            border-right: 1px solid #e0e0e0;
+            color: #bdbdbd;
+            height: 100%;
+        }
+
+        .tile-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--primary-navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+            flex: 1;
+            text-align: left;
+        }
+
+        .tile-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .toggle-mini {
+            display: flex;
+            align-items: center;
+            background: #eee;
+            border-radius: 14px;
+            padding: 0px;
+            height: 18px;
+        }
+
+        .opt-mini {
+            padding: 0 12px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            line-height: 1;
+        }
+
+        .opt-mini.active {
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .del-mini {
+            color: #bdbdbd;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        .del-mini:hover {
+            color: var(--accent-red);
+        }
+
+        .report-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            gap: 16px;
+            z-index: 10;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .btn-report {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 4px;
+            border: 1px solid var(--branding-magenta);
+            background: var(--white);
+            color: var(--branding-magenta);
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-report:hover {
+            background: var(--branding-magenta);
+            color: white;
+            box-shadow: var(--shadow-1);
+        }
+
+        #pdf-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            background: #525659;
+        }
+
+        #canvas-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9e9e9e;
+        }
+
+        .favorite-star {
+            color: #fbc02d;
+            margin-left: 5px;
+            font-size: 0.85rem;
+        }
+
+        /* --- THEME VIEW STYLES --- */
+        #theme-view {
+            display: none;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .theme-page-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-page-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--primary-navy);
+        }
+
+        .btn-add-theme {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+            transition: all 0.25s ease;
+        }
+
+        .btn-add-theme:hover {
+            background: #f9fafb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        .saved-themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            margin-top: 16px;
+            margin-bottom: 40px;
+        }
+
+        .theme-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .theme-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .theme-card.favorite {
+            border-left: 4px solid #facc15;
+        }
+
+        .theme-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .theme-card-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1f2937;
+        }
+
+        .star-fav {
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #cbd5e1;
+            transition: transform 0.2s ease;
+        }
+
+        .star-fav:hover {
+            transform: scale(1.15);
+        }
+
+        .star-fav.active {
+            color: #facc15;
+        }
+
+        .theme-preview-strip {
+            display: flex;
+            height: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        .preview-swatch {
+            flex: 1;
+        }
+
+        .theme-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+
+        .btn-theme-action {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .btn-theme-action:hover:not(.apply-active) {
+            background: #f8fafc;
+            color: #1f2937;
+            border-color: #cbd5e1;
+        }
+
+        .btn-theme-action.apply-active {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #bbf7d0;
+            cursor: default;
+        }
+
+        .btn-theme-action.delete:hover {
+            color: #d32f2f;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        /* --- MODAL SYSTEM --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 36, 66, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: white;
+            width: 95%;
+            max-width: 900px;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-close-trigger {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 1.25rem;
+            color: #64748b;
+            cursor: pointer;
+            z-index: 2010;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .modal-close-trigger:hover {
+            background: #f1f5f9;
+            color: var(--accent-red);
+        }
+
+        /* Theme Designer Styles */
+        .designer-container-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .designer-card {
+            background: white;
+            width: 100%;
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .config-table-refined {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 12px;
+        }
+
+        .config-table-refined th {
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            padding: 0 12px 4px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .config-table-refined td {
+            padding: 4px 12px;
+            vertical-align: middle;
+        }
+
+        .input-color-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-color-refined {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+            background: none;
+        }
+
+        .select-config-refined {
+            width: 100%;
+            height: 36px;
+            padding: 0 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .designer-footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-header-back {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            padding: 6px 16px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .section-subheader-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        /* --- THEME PREVIEW SPECIFIC STYLES --- */
+        .preview-report-mock {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 16px;
+        }
+
+        .mock-header {
+            padding: 16px 24px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mock-subheader {
+            padding: 8px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .mock-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mock-group-row {
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .mock-body-row {
+            padding: 10px 24px;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #f8fafc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .mock-footer {
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+
+<body onclick="closePopover(event)">
+
+    <nav class="sidebar">
+        <!-- Sidebar items triggered switchNav. Type 'theme' switches to Theme Management -->
+        <div class="sidebar-icon active" title="Home" onclick="switchNav('reports', this)"><i class="fa-solid fa-house"></i></div>
+        <div class="sidebar-icon" title="Reports" onclick="switchNav('reports', this)"><i class="fa-solid fa-clipboard-list"></i></div>
+        <div class="sidebar-icon" title="Theme Management" onclick="switchNav('theme', this)"><i class="fa-solid fa-palette"></i></div>
+        
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon" title="Help"><i class="fa-solid fa-circle-question"></i></div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <header class="top-header">
+            <div class="brand"><i class="fa-brands fa-hubspot fa-lg"></i> My Apps <i class="fa-solid fa-caret-down"></i></div>
+            <div class="header-right"><i class="fa-solid fa-gear"></i><i class="fa-solid fa-circle-user fa-lg"></i></div>
+        </header>
+
+        <div class="secondary-nav">
+            <div class="nav-items-group" id="topNavItems">
+                <div class="nav-item active" onclick="switchNav('reports', this)"><i class="fa-solid fa-clipboard-list"></i> My Reports</div>
+                <div class="nav-item" onclick="switchNav('sales', this)"><i class="fa-solid fa-chart-line"></i> Sales</div>
+                <div class="nav-item" onclick="switchNav('forecasting', this)"><i class="fa-solid fa-chart-pie"></i> Forecasting</div>
+                <div class="nav-item" onclick="switchNav('labor', this)"><i class="fa-solid fa-hard-hat"></i> Labor</div>
+                <div class="nav-item" onclick="switchNav('food', this)"><i class="fa-solid fa-utensils"></i> Food</div>
+                <!-- Theme removed from here -->
+            </div>
+
+            <div class="smart-search-wrapper" id="navSearchWrapper">
+                <div class="smart-search-container">
+                    <input type="text" class="smart-search-input" id="reportSearch" placeholder="Type to search report name" onkeyup="searchReports()">
+                    <i class="fa-solid fa-magnifying-glass smart-search-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="selection-summary-bar" id="summary-bar" style="display:none;">
+            <div id="navigationBreadcrumb" class="navigation-breadcrumb-container"></div>
+            <i id="reportHeaderStar" class="fa-regular fa-star header-star" onclick="toggleHeaderFavorite()"></i>
+
+            <div class="summary-chips-group">
+                <div class="summary-chip" id="chip-location">
+                    <div class="chip-icon-circle"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="chip-text-group">
+                        <span class="chip-label">LOCATION</span>
+                        <span class="chip-value" id="sum-loc-value">None selected</span>
+                    </div>
+                    <i class="fa-solid fa-xmark chip-close" onclick="clearLocationSelection()"></i>
+                </div>
+
+                <div class="summary-chip" id="chip-date">
+                    <div class="chip-icon-circle purple"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div class="chip-text-group">
+                        <span class="chip-label">DATE RANGE</span>
+                        <span class="chip-value" id="sum-date-value">No date selected</span>
+                    </div>
+                    <i class="fa-solid fa-xmark chip-close" onclick="clearDateSelection()"></i>
+                </div>
+
+                <div class="summary-chip" id="chip-filters" onclick="toggleFilterPopover(event)">
+                    <div class="chip-icon-circle"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="chip-text-group">
+                        <span class="chip-label">FILTERS</span>
+                        <span class="chip-value" id="sum-filters-value">0 Active</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down chip-arrow"></i>
+                </div>
+            </div>
+
+            <div class="summary-right-actions">
+                <button class="btn-reset-text" onclick="resetAllDashboardFilters()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+            </div>
+
+            <div id="filterPopover" class="filter-popover" onclick="event.stopPropagation()"></div>
+        </div>
+
+        <div class="dashboard-body">
+            <div class="canvas-area" id="canvas">
+                <div id="my-reports-view" class="my-reports-container"></div>
+
+                <!-- Theme View Container -->
+                <div id="theme-view">
+                    <!-- Theme List Page -->
+                    <div id="theme-list-page">
+                        <div class="theme-page-header">
+                            <span class="theme-page-title">Theme Management</span>
+                            <!-- <button class="btn-add-theme" onclick="openThemeDesigner()">
+                                <i class="fa-solid fa-plus"></i> Add Theme
+                            </button> -->
+                        </div>
+                        <div id="themeSectionsContainer"></div>
+                    </div>
+
+                    <!-- Theme Designer Modal -->
+                    <div id="themeDesignerModal" class="modal-overlay">
+                        <div class="modal-container">
+                            <i class="fa-solid fa-xmark modal-close-trigger" onclick="closeThemeDesigner()"></i>
+                            <div id="theme-designer-page">
+                                <div class="designer-container-wrapper">
+                                    <div class="designer-card">
+                                        <div class="theme-page-title" style="margin-bottom: 24px;">Theme Configuration</div>
+                                        <input type="text" id="themeNameInput" class="smart-search-input" placeholder="Theme Name" style="margin-bottom:24px; height:44px;">
+                                        <table class="config-table-refined">
+                                            <thead>
+                                                <tr>
+                                                    <th>Section</th>
+                                                    <th>Background</th>
+                                                    <th>Text</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-section="header">
+                                                    <td>Header</td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#0e2442" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#ffffff" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                </tr>
+                                                <tr data-section="subheader">
+                                                    <td>Sub Header</td>
+                                                    <td><span style="font-size:0.7rem; color:#94a3b8; font-weight:700;">N/A</span></td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#1976d2" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                </tr>
+                                                <tr data-section="groupby">
+                                                    <td>Group By</td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#e3f2fd" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#0e2442" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                </tr>
+                                                <tr data-section="body">
+                                                    <td>Body</td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#ffffff" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#333333" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                </tr>
+                                                <tr data-section="footer">
+                                                    <td>Footer</td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#0e2442" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-color-wrapper"><input type="color" value="#ffffff" class="input-color-refined" oninput="updateThemePreview()"></div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <div class="designer-footer">
+                                            <button class="btn-secondary" onclick="closeThemeDesigner()">CANCEL</button>
+                                            <button class="btn-primary" onclick="saveNewTheme()">Save Theme</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theme Preview Modal -->
+                    <div id="themePreviewModal" class="modal-overlay">
+                        <div class="modal-container" style="max-width: 800px;">
+                            <i class="fa-solid fa-xmark modal-close-trigger" onclick="closeThemePreview()"></i>
+                            <div class="panel-header" id="previewThemeTitle" style="font-size: 1.1rem; border-bottom: 1px solid #f1f5f9; padding: 20px 32px;">Theme Preview</div>
+                            <div class="panel-body" style="padding: 32px; background: #f9fafb;">
+                                <div class="preview-report-mock">
+                                    <div class="mock-header" id="mh-header">
+                                        <span>Corporate Sales Analysis</span>
+                                        <span style="font-size: 0.7rem; opacity: 0.8;">Date: 03/13/2026</span>
+                                    </div>
+                                    <div class="mock-subheader" id="mh-subheader">Regional Performance Summary</div>
+                                    <div class="mock-group-row" id="mh-groupby">South East Region</div>
+                                    <div class="mock-body-row" id="mh-body-1">
+                                        <span>Net Sales Total</span>
+                                        <span style="font-weight: 700;">$42,890.00</span>
+                                    </div>
+                                    <div class="mock-body-row" id="mh-body-2">
+                                        <span>Labor Percentage</span>
+                                        <span style="font-weight: 700;">14.2%</span>
+                                    </div>
+                                    <div class="mock-footer" id="mh-footer">Report Generated By Altametrics</div>
+                                </div>
+                                <p style="font-size: 0.75rem; color: #64748b; text-align: center; font-style: italic;">Note: This is a read-only preview of the theme styling.</p>
+                            </div>
+                            <div class="designer-footer" style="padding: 20px 32px; background: white;">
+                                <button class="btn-secondary" onclick="closeThemePreview()">Close</button>
+                                <button class="btn-primary" id="useThemeBtn">Use This Theme</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="canvas-placeholder" style="display:none;">
+                    <i class="fa-solid fa-chart-simple fa-3x" style="margin-bottom:16px;"></i>
+                    <p>Select criteria from the panel on the right.</p>
+                </div>
+
+                <iframe id="pdf-viewer"></iframe>
+            </div>
+
+            <div class="right-panel-container">
+                <div class="tree-side-tab" id="treeSideTab">
+                    <i class="fa-solid fa-xmark side-tab-close" onclick="document.getElementById('treeSideTab').classList.remove('expanded')"></i>
+                    <span class="section-title" id="side-tab-title" style="margin-bottom:15px; display:block;">Select Category</span>
+
+                    <div id="locationContent" style="display:none;">
+                        <div class="search-container"><input type="text" class="tree-search" placeholder="Search..." onkeyup="filterTree(this.value)"><i class="fa-solid fa-magnifying-glass search-icon"></i></div>
+                        <div id="rollupToggle" class="rollup-toggle-container">
+                            <div class="radio-group">
+                                <label class="radio-label"><input type="radio" name="rollupView" value="rollup" checked onchange="handleRollupChange(this)"><span>Show Rollup</span></label>
+                                <label class="radio-label"><input type="radio" name="rollupView" value="separate" onchange="handleRollupChange(this)"><span>Store-level Breakdown</span></label>
+                            </div>
+                        </div>
+                        <div class="loc-tree" id="locationTree">
+                            <div class="loc-tree-node tree-item" data-name="all"><input type="checkbox" id="cb-all" class="loc-cb" onchange="handleLocationSelection(this)"><span onclick="toggleNodeSelection('cb-all')">All</span></div>
+                            <ul id="tree-root" class="show">
+                                <li class="tree-item" data-name="south region (2)">
+                                    <div class="loc-tree-node"><i class="fa-solid fa-caret-down tree-expander" onclick="toggleTree(this, event)"></i><input type="checkbox" id="cb-south" class="loc-cb region-cb" onchange="handleLocationSelection(this)"><span>South Region (2)</span></div>
+                                    <ul class="show">
+                                        <li class="tree-item" data-name="store 00044">
+                                            <div class="loc-tree-node"><input type="checkbox" id="cb-store44" class="loc-cb multi-allowed store-cb" onchange="handleLocationSelection(this)"><span>Store 00044</span></div>
+                                        </li>
+                                        <li class="tree-item" data-name="store 00179">
+                                            <div class="loc-tree-node"><input type="checkbox" id="cb-store179" class="loc-cb multi-allowed store-cb" onchange="handleLocationSelection(this)"><span>Store 00179</span></div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="tree-item" data-name="north region (2)">
+                                    <div class="loc-tree-node"><i class="fa-solid fa-caret-down tree-expander" onclick="toggleTree(this, event)"></i><input type="checkbox" id="cb-north" class="loc-cb region-cb" onchange="handleLocationSelection(this)"><span>North Region (2)</span></div>
+                                    <ul class="show">
+                                        <li class="tree-item" data-name="store 00001">
+                                            <div class="loc-tree-node"><input type="checkbox" id="cb-store1" class="loc-cb multi-allowed store-cb" onchange="handleLocationSelection(this)"><span>Store 00001</span></div>
+                                        </li>
+                                        <li class="tree-item" data-name="store 00002">
+                                            <div class="loc-tree-node"><input type="checkbox" id="cb-store2" class="loc-cb multi-allowed store-cb" onchange="handleLocationSelection(this)"><span>Store 00002</span></div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="dateContent" style="display:none;" class="sidebar-date-container">
+                        <div class="date-input-row" style="display:flex; gap:16px;">
+                            <div class="date-field">
+                                <label>Start Date</label>
+                                <input type="text" placeholder="mm/dd/yyyy" id="sidebar-start-text">
+                                <input type="date" onchange="updateDateText(this, 'sidebar-start-text')">
+                                <i class="fa-regular fa-calendar-days"></i>
+                            </div>
+                            <div class="date-field">
+                                <label>End Date</label>
+                                <input type="text" placeholder="mm/dd/yyyy" id="sidebar-end-text">
+                                <input type="date" onchange="updateDateText(this, 'sidebar-end-text')">
+                                <i class="fa-regular fa-calendar-days"></i>
+                            </div>
+                        </div>
+                        <div class="date-links-grid">
+                            <div class="date-cat-label" onclick="loadDateData('Date')">Date</div>
+                            <div class="date-actions"><span onclick="loadDateData('Date')">Current</span><span onclick="loadDateData('Date')">Last</span></div>
+                            <div class="date-cat-label" onclick="loadDateData('Week')">Week</div>
+                            <div class="date-actions"><span onclick="loadDateData('Week')">Current</span><span onclick="loadDateData('Week')">Last</span></div>
+                            <div class="date-cat-label" onclick="loadDateData('Periods')">Periods</div>
+                            <div class="date-actions"><span onclick="loadDateData('Periods')">Current</span><span onclick="loadDateData('Periods')">Last</span></div>
+                            <div class="date-cat-label" onclick="loadDateData('PayPeriods')">Pay Periods</div>
+                            <div class="date-actions"><span onclick="loadDateData('PayPeriods')">Current</span><span onclick="loadDateData('PayPeriods')">Last</span></div>
+                            <div class="date-cat-label" onclick="loadDateData('Year')">Year</div>
+                            <div class="date-actions"><span onclick="loadDateData('Year')">Current</span><span onclick="loadDateData('Year')">Last</span></div>
+                        </div>
+                        <div class="info-panel" id="dateDataPanel">
+                            <div class="info-panel-placeholder">Select a category to load data.</div>
+                        </div>
+                    </div>
+
+                    <div id="categorySidebarContent" style="display:none;" class="sidebar-list-container"></div>
+                    
+                    <div id="themeSidebarContent" style="display:none;" class="sidebar-list-container"></div>
+
+                    <div id="sortSidebarContent" style="display:none;" class="sidebar-list-container">
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'sort')">
+                            <div><input type="checkbox" class="sort-sidebar-cb"> <span>Region</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'sort')">
+                            <div><input type="checkbox" class="sort-sidebar-cb"> <span>Store</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'sort')">
+                            <div><input type="checkbox" class="sort-sidebar-cb"> <span>Date</span></div>
+                        </div>
+                    </div>
+
+                    <div id="columnSidebarContent" style="display:none;" class="sidebar-list-container">
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Region Id</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Region Name</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Store Id</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Store Name</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Busi Date</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Net Sales($)</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Gross Sales($)</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Comps($)</span></div>
+                        </div>
+                        <div class="sidebar-list-item" onclick="handleListSelection(this, 'columns')">
+                            <div><input type="checkbox" class="columns-sidebar-cb"> <span>Discounts($)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vertical-tabs" id="adhoc-vtabs" style="display:none;">
+                    <div class="v-tab active" id="vtab-filters" onclick="openTab('filters', this)"><i class="fa-solid fa-filter"></i> Filters</div>
+                </div>
+
+                <div class="panel-content-wrapper" id="rightPanel">
+                    <div id="tab-filters" class="panel-body">
+                        <div class="panel-header" style="padding:0 0 5px 0; background:none; border:none; justify-content: flex-end;"><i class="fa-solid fa-angles-right" onclick="togglePanel()" style="cursor:pointer; color:var(--text-secondary);"></i></div>
+
+                        <div class="grouped-selection-box">
+                            <div class="section-title" style="margin-bottom: 8px;">FILTERS</div>
+
+                            <div class="tile-block">
+                                <div id="modern-loc-display" class="modern-tile-container">
+                                    <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('loc', 'Select Location')">
+                                        <span>No Store Selected</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tile-block">
+                                <div id="modern-date-display" class="modern-tile-container">
+                                    <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('date', 'Select Date')">
+                                        <span>No Date Selected</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tile-block">
+                                <div id="modern-minor-display" class="modern-tile-container">
+                                    <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('minor', 'Select Minor Category')">
+                                        <span>SELECT MINOR CATEGORY</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tile-block">
+                                <div id="modern-major-display" class="modern-tile-container">
+                                    <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('major', 'Select Major Category')">
+                                        <span>SELECT MAJOR CATEGORY</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tile-block theme-block">
+                            <div id="modern-report-theme-display" class="modern-tile-container">
+                                <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('reportTheme', 'Select Theme')">
+                                    <span>SELECT THEME</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tile-block data-block">
+                            <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%; padding: 4px 0;" onclick="event.stopPropagation(); toggleSideTabWithState('columns', 'Data Columns')">
+                                <span>DATA COLUMNS</span>
+                                <i class="fa-solid fa-circle-plus" style="color:var(--primary-blue); font-size: 1rem;"></i>
+                            </div>
+                            <div id="columns-display-list" class="display-area"></div>
+                        </div>
+
+                        <div class="tile-block sort-block">
+                            <div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%; padding: 4px 0;" onclick="event.stopPropagation(); toggleSideTabWithState('sort', 'Sort Criteria')">
+                                <span>Sort Criteria</span>
+                                <i class="fa-solid fa-circle-plus" style="color:var(--primary-blue); font-size: 1rem;"></i>
+                            </div>
+                            <div id="sort-display-list" class="display-area"></div>
+                        </div>
+
+                        <div class="report-actions">
+                            <button class="btn-report" onclick="runPdfReport()"><i class="fa-solid fa-file-pdf"></i> Run PDF</button>
+                            <button class="btn-report" onclick="alert('Running Excel...')"><i class="fa-solid fa-file-excel"></i> Run Excel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentSelections = {
+            minor: [],
+            major: []
+        };
+        let lastActiveCategory = 'reports';
+
+        const moduleReports = {
+            'reports': [{
+                    title: 'My Favorites',
+                    reports: ['Inventory Report', 'Payroll Report', 'Discount Report', 'Daily Sales Report']
+                },
+                {
+                    title: 'Recently Viewed',
+                    reports: ['Food Cost Report', 'Daily Punch Report', 'Menu Mix Report(View By Items)']
+                }
+            ],
+            'sales': [{
+                    title: 'Sales Performance',
+                    reports: ['Discount Report', 'Weekly Hourly Report']
+                },
+                {
+                    title: 'Product Mix Report',
+                    reports: ['Menu Mix Report(View By Items)', 'Menu Mix Report(View By Category)', 'PMIX Summary Report']
+                },
+                {
+                    title: 'Employee Sales Performance',
+                    reports: ['Employee Sales Summary', 'Tlog Viewer Report']
+                }
+            ],
+            'labor': [{
+                    title: 'Timeclock Report',
+                    reports: ['Daily Punch Report', 'Ignored Punch Report']
+                },
+                {
+                    title: 'Labor Scheduling',
+                    reports: ['Labor Stats Report', 'Scheduled Summary Report']
+                },
+                {
+                    title: 'Payroll Processing',
+                    reports: ['Payroll Report', 'Payroll Rollup Report', 'Timekeeping Header Report', 'Extra Pay Report', 'Pay Period Summary Report']
+                },
+                {
+                    title: 'Employee Performance & Efficiency',
+                    reports: ['Timeoff Report']
+                },
+                {
+                    title: 'Communication & Notes',
+                    reports: ['Notes and Broadcast Report']
+                }
+            ],
+            'food': [{
+                    title: 'Inventory Tracking',
+                    reports: ['GL COGS Export Report', 'Inventory Report', 'GL COGS Export Rollup Report', 'Inventory Rollup Report', 'Inventory Summary Report', 'Food Cost Report']
+                },
+                {
+                    title: 'Stock Visibility',
+                    reports: ['Ordering and Receiving Summary Report', 'Transfer Summary Report', 'Waste Summary Report']
+                }
+            ],
+            'forecasting': [{
+                    title: 'Budget Reports',
+                    reports: ['Weekly Budget Variance']
+                },
+                {
+                    title: 'Projections',
+                    reports: ['Sales Projection', 'Guest Count Projection']
+                }
+            ]
+        };
+
+        function renderReportTiles(moduleType) {
+            const container = document.getElementById('my-reports-view');
+            container.innerHTML = '';
+            const groups = moduleReports[moduleType] || [];
+
+            groups.forEach(group => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'report-group';
+                groupDiv.innerHTML = `<div class="report-group-title">${group.title}</div>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'report-grid';
+
+                group.reports.forEach(name => {
+                    const item = document.createElement('div');
+                    item.className = 'report-link-item search-target';
+                    item.onclick = () => openReportUI(name, moduleType, group.title);
+
+                    let starHtml = '';
+                    if (moduleType !== 'reports' && isReportInMyReports(name)) {
+                        starHtml = '<i class="fa-solid fa-star favorite-star"></i>';
+                    }
+
+                    item.innerHTML = `<div class="report-icon-box"><i class="fa-regular fa-file-lines"></i></div><span class="report-link-text">${name}</span>${starHtml}`;
+                    grid.appendChild(item);
+                });
+
+                if (group.reports.length > 0) {
+                    groupDiv.appendChild(grid);
+                    container.appendChild(groupDiv);
+                }
+            });
+        }
+
+        function searchReports() {
+            const input = document.getElementById('reportSearch').value.toLowerCase();
+            const reportGroups = document.querySelectorAll('.report-group');
+            reportGroups.forEach(group => {
+                const reportItems = group.querySelectorAll('.search-target');
+                let hasVisibleReport = false;
+                reportItems.forEach(item => {
+                    const text = item.querySelector('.report-link-text').innerText.toLowerCase();
+                    if (text.includes(input)) {
+                        item.style.display = 'flex';
+                        hasVisibleReport = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                group.style.display = hasVisibleReport ? 'flex' : 'none';
+            });
+        }
+
+        function goBack() {
+            const navItems = document.querySelectorAll('.nav-item');
+            let targetEl = null;
+            navItems.forEach(item => {
+                const clickAttr = item.getAttribute('onclick');
+                if (clickAttr && clickAttr.includes(`'${lastActiveCategory}'`)) {
+                    targetEl = item;
+                }
+            });
+            if (targetEl) {
+                switchNav(lastActiveCategory, targetEl);
+            } else {
+                switchNav('reports', document.querySelector('.nav-item:first-child'));
+            }
+        }
+
+        function openReportUI(reportName, moduleKey, subModule) {
+            document.getElementById('my-reports-view').style.display = 'none';
+            document.getElementById('canvas-placeholder').style.display = 'flex';
+            document.getElementById('summary-bar').style.display = 'flex';
+            document.getElementById('adhoc-vtabs').style.display = 'flex';
+
+            const moduleMap = {
+                'reports': 'My Reports',
+                'sales': 'Sales',
+                'forecasting': 'Forecasting',
+                'labor': 'Labor',
+                'food': 'Food'
+            };
+            const modDisplay = moduleMap[moduleKey] || 'Module';
+
+            const breadcrumbHTML = `
+                <span class="breadcrumb-link" onclick="goBack()">${modDisplay}</span>
+                <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i></span>
+                <span class="breadcrumb-link" onclick="goBack()">${subModule}</span>
+                <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right" style="font-size: 0.6rem;"></i></span>
+                <span class="breadcrumb-current">${reportName}</span>
+            `;
+
+            document.getElementById('navigationBreadcrumb').innerHTML = breadcrumbHTML;
+
+            const headerStar = document.getElementById('reportHeaderStar');
+            if (isReportInMyReports(reportName)) {
+                headerStar.classList.remove('fa-regular');
+                headerStar.classList.add('fa-solid', 'active');
+            } else {
+                headerStar.classList.add('fa-regular');
+                headerStar.classList.remove('fa-solid', 'active');
+            }
+            openTab('filters', document.getElementById('vtab-filters'));
+        }
+
+        function isReportInMyReports(name) {
+            const myReportsGroups = moduleReports['reports'];
+            for (let group of myReportsGroups) {
+                if (group.reports.includes(name)) return true;
+            }
+            return false;
+        }
+
+        function toggleHeaderFavorite() {
+            const name = document.querySelector('.breadcrumb-current').innerText;
+            const star = document.getElementById('reportHeaderStar');
+            const isFav = star.classList.contains('active');
+            if (!isFav) {
+                star.classList.remove('fa-regular');
+                star.classList.add('fa-solid', 'active');
+                addToMyReports(name);
+            } else {
+                star.classList.add('fa-regular');
+                star.classList.remove('fa-solid', 'active');
+                removeFromMyReports(name);
+            }
+        }
+
+        function findOriginalCategory(reportName) {
+            const modules = ['sales', 'labor', 'forecasting', 'food'];
+            for (let mod of modules) {
+                if (moduleReports[mod]) {
+                    for (let group of moduleReports[mod]) {
+                        if (group.reports.includes(reportName)) {
+                            return group.title;
+                        }
+                    }
+                }
+            }
+            return 'Other Reports';
+        }
+
+        function addToMyReports(name) {
+            const originalCategory = findOriginalCategory(name);
+            let targetGroup = moduleReports['reports'].find(g => g.title === originalCategory);
+            if (!targetGroup) {
+                moduleReports['reports'].unshift({
+                    title: originalCategory,
+                    reports: []
+                });
+                targetGroup = moduleReports['reports'][0];
+            }
+            if (!targetGroup.reports.includes(name)) {
+                targetGroup.reports.push(name);
+            }
+        }
+
+        function removeFromMyReports(name) {
+            moduleReports['reports'].forEach(g => {
+                const idx = g.reports.indexOf(name);
+                if (idx > -1) g.reports.splice(idx, 1);
+            });
+        }
+
+        function runPdfReport() {
+            document.getElementById('canvas-placeholder').style.display = 'none';
+            document.getElementById('my-reports-view').style.display = 'none';
+
+            // Ensure the backend logic uses the freshest theme state
+            const currentTheme = savedThemes.find(t => t.id == selectedReportThemeId);
+            console.log(`[Backend API] Generating PDF with Theme ID: ${selectedReportThemeId} (${currentTheme ? currentTheme.name : 'Unknown'})`);
+
+            let viewer = document.getElementById('pdf-viewer');
+            if (!viewer) {
+                viewer = document.createElement('iframe');
+                viewer.id = 'pdf-viewer';
+                viewer.src = 'SalesTaxReport.pdf';
+                document.getElementById('canvas').appendChild(viewer);
+            }
+            viewer.style.display = 'block';
+        }
+
+        /* --- NAVIGATION LOGIC --- */
+        function switchNav(type, el) {
+            // Update active states for top nav items
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Update active states for sidebar icons
+            document.querySelectorAll('.sidebar-icon').forEach(icon => icon.classList.remove('active'));
+
+            // Handle the clicked element activation
+            if (el) {
+                el.classList.add('active');
+            }
+
+            if (type !== 'adhoc') {
+                lastActiveCategory = type;
+            }
+
+            const reportsView = document.getElementById('my-reports-view');
+            const themeView = document.getElementById('theme-view');
+            const placeholder = document.getElementById('canvas-placeholder');
+            const summaryBar = document.getElementById('summary-bar');
+            const adhocTabs = document.getElementById('adhoc-vtabs');
+            const rightPanel = document.getElementById('rightPanel');
+            const treeSideTab = document.getElementById('treeSideTab');
+
+            const viewer = document.getElementById('pdf-viewer');
+            if (viewer) viewer.style.display = 'none';
+
+            if (type === 'theme') {
+                reportsView.style.display = 'none';
+                themeView.style.display = 'block';
+                placeholder.style.display = 'none';
+                summaryBar.style.display = 'none';
+                adhocTabs.style.display = 'none';
+                rightPanel.classList.remove('open');
+                treeSideTab.classList.remove('expanded');
+                renderSavedThemes();
+            } else if (type === 'adhoc') {
+                reportsView.style.display = 'none';
+                themeView.style.display = 'none';
+                placeholder.style.display = 'flex';
+                summaryBar.style.display = 'flex';
+                adhocTabs.style.display = 'flex';
+            } else {
+                renderReportTiles(type);
+                reportsView.style.display = 'grid';
+                themeView.style.display = 'none';
+                placeholder.style.display = 'none';
+                summaryBar.style.display = 'none';
+                adhocTabs.style.display = 'none';
+                rightPanel.classList.remove('open');
+                treeSideTab.classList.remove('expanded');
+            }
+        }
+
+        function openTab(name, el) {
+            document.getElementById('treeSideTab').classList.remove('expanded');
+            document.getElementById('tab-filters').style.display = 'block';
+            document.querySelectorAll('.v-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+            document.getElementById('rightPanel').classList.add('open');
+        }
+
+        function toggleSideTabWithState(type, title) {
+            const sideTab = document.getElementById('treeSideTab');
+            const currentActive = sideTab.getAttribute('data-active-type');
+            if (sideTab.classList.contains('expanded') && currentActive === type) {
+                sideTab.classList.remove('expanded');
+            } else {
+                sideTab.setAttribute('data-active-type', type);
+                toggleSideTab(type, title);
+            }
+        }
+
+        function toggleSideTab(type, title) {
+            const sideTab = document.getElementById('treeSideTab');
+            document.getElementById('side-tab-title').innerText = title;
+            ['locationContent', 'dateContent', 'categorySidebarContent', 'sortSidebarContent', 'columnSidebarContent', 'themeSidebarContent'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            if (type === 'minor' || type === 'major') {
+                const list = document.getElementById('categorySidebarContent');
+                list.innerHTML = '';
+                const items = type === 'minor' ? ['Adult Beverage', 'Adult Buffet', 'Beer', 'Wine'] : ['Food', 'Beverage'];
+                items.forEach(item => {
+                    const isChecked = currentSelections[type].includes(item) ? 'checked' : '';
+                    const div = document.createElement('div');
+                    div.className = 'sidebar-list-item';
+                    div.onclick = function() {
+                        handleCategorySelection(this, type);
+                    };
+                    div.innerHTML = `<div><input type="checkbox" class="cat-cb" ${isChecked}> <span>${item}</span></div>`;
+                    list.appendChild(div);
+                });
+            }
+            
+            if (type === 'reportTheme') {
+                populateThemeSidebar();
+            }
+
+            const mapping = {
+                'loc': 'locationContent',
+                'date': 'dateContent',
+                'minor': 'categorySidebarContent',
+                'major': 'categorySidebarContent',
+                'sort': 'sortSidebarContent',
+                'columns': 'columnSidebarContent',
+                'reportTheme': 'themeSidebarContent'
+            };
+            if (mapping[type]) document.getElementById(mapping[type]).style.display = (type === 'loc' || type === 'date' ? 'block' : 'flex');
+            sideTab.setAttribute('data-target-label', type + '-display');
+            sideTab.classList.add('expanded');
+        }
+
+        function toggleFilterPopover(event) {
+            event.stopPropagation();
+            const popover = document.getElementById('filterPopover');
+            const sections = [{
+                    label: 'Minor Category',
+                    data: currentSelections.minor
+                },
+                {
+                    label: 'Major Category',
+                    data: currentSelections.major
+                },
+                {
+                    label: 'Data Columns',
+                    id: 'columns-display-list',
+                    type: 'list'
+                },
+                {
+                    label: 'Sort',
+                    id: 'sort-display-list',
+                    type: 'list'
+                }
+            ];
+            let html = '';
+            sections.forEach(sec => {
+                let items = sec.data ? sec.data : Array.from(document.getElementById(sec.id).querySelectorAll('.tile-name')).map(el => el.innerText);
+                if (items.length > 0) html += `<div class="popover-section"><div class="popover-header">${sec.label}</div>${items.map(i => `<div class="popover-item">${i}</div>`).join('')}</div>`;
+            });
+            popover.innerHTML = html || '<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:10px;">No filters selected</div>';
+            popover.style.display = popover.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function closePopover(event) {
+            document.getElementById('filterPopover').style.display = 'none';
+            const tree = document.getElementById('treeSideTab');
+            if (tree.classList.contains('expanded') && !tree.contains(event.target)) {
+                tree.classList.remove('expanded');
+                tree.removeAttribute('data-active-type');
+            }
+        }
+
+        function updateSelectedFiltersSummary() {
+            const container = document.getElementById('sum-filters-value');
+            let totalCount = currentSelections.minor.length + currentSelections.major.length + document.getElementById('sort-display-list').querySelectorAll('.tile-row').length + document.getElementById('columns-display-list').querySelectorAll('.tile-row').length;
+            container.innerText = totalCount === 0 ? '0 Active' : `${totalCount} Active`;
+        }
+
+        function resetAllDashboardFilters() {
+            document.querySelectorAll('.loc-cb, .total-selection-cb, .sort-sidebar-cb, .columns-sidebar-cb').forEach(cb => {
+                cb.checked = false;
+                cb.disabled = false;
+            });
+            currentSelections.minor = [];
+            currentSelections.major = [];
+            
+            // Re-select actual default theme on reset
+            const defaultTheme = savedThemes.find(t => t.isDefault);
+            selectedReportThemeId = defaultTheme ? defaultTheme.id : null;
+
+            document.getElementById('sidebar-start-text').value = '';
+            document.getElementById('sidebar-end-text').value = '';
+            updateLocationUI();
+            updateRollupVisibility();
+            clearDateSelection();
+            updateCategoryTiles('minor');
+            updateCategoryTiles('major');
+            updateSortTiles();
+            updateColumnTiles();
+            updateThemeUI();
+            updateSelectedFiltersSummary();
+        }
+
+        function handleRollupChange(radio) {
+            console.log("Rollup selection changed to:", radio.value);
+        }
+
+        function updateRollupVisibility() {
+            const regionCount = document.querySelectorAll('.region-cb:checked').length;
+            const storeCount = document.querySelectorAll('.store-cb:checked').length;
+            const toggleContainer = document.getElementById('rollupToggle');
+            if (regionCount > 0 || storeCount > 1) {
+                toggleContainer.style.display = 'block';
+                if (!document.querySelector('input[name="rollupView"]:checked')) {
+                    document.querySelector('input[value="rollup"]').checked = true;
+                }
+            } else {
+                toggleContainer.style.display = 'none';
+                document.querySelector('input[value="rollup"]').checked = true;
+            }
+        }
+
+        function handleLocationSelection(input) {
+            const all = document.getElementById('cb-all');
+            const otherCheckboxes = document.querySelectorAll('.loc-cb:not(#cb-all)');
+            const regions = document.querySelectorAll('.region-cb');
+            const stores = document.querySelectorAll('.store-cb');
+
+            if (input.id === 'cb-all') {
+                if (all.checked) {
+                    otherCheckboxes.forEach(cb => {
+                        cb.checked = false;
+                        cb.disabled = true;
+                    });
+                } else {
+                    otherCheckboxes.forEach(cb => {
+                        cb.disabled = false;
+                    });
+                }
+            } else if (input.classList.contains('store-cb')) {
+                const anyStoreChecked = Array.from(stores).some(s => s.checked);
+                regions.forEach(r => {
+                    if (anyStoreChecked) {
+                        r.checked = false;
+                        r.disabled = true;
+                    } else {
+                        r.disabled = false;
+                    }
+                });
+            } else if (input.classList.contains('region-cb')) {
+                const anyRegionChecked = Array.from(regions).some(r => r.checked);
+                stores.forEach(s => {
+                    if (anyRegionChecked) {
+                        s.checked = false;
+                        s.disabled = true;
+                    } else {
+                        s.disabled = false;
+                    }
+                });
+            }
+            updateLocationUI();
+            updateRollupVisibility();
+        }
+
+        function updateLocationUI() {
+            const checked = Array.from(document.querySelectorAll('.loc-cb:checked')).map(c => c.parentElement.querySelector('span').innerText);
+            const display = document.getElementById('modern-loc-display');
+            const sumLoc = document.getElementById('sum-loc-value');
+            if (checked.length === 0) {
+                display.innerHTML = '<div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState(\'loc\', \'Select Location\')"><span>No Store Selected</span><i class="fa-solid fa-chevron-down"></i></div>';
+                sumLoc.innerText = 'None selected';
+            } else {
+                const txt = checked.length > 1 ? checked[0] + ', ' + checked[1] + '...' : checked[0];
+                display.innerHTML = `<div style="width:100%"><div class="section-title" style="margin-bottom:6px;">Selected Store</div><div class="modern-tile" style="cursor:pointer;" onclick="event.stopPropagation(); toggleSideTabWithState('loc', 'Select Location')"><span>${txt}</span><i class="fa-solid fa-xmark" onclick="event.stopPropagation(); clearLocationSelection()"></i></div></div>`;
+                sumLoc.innerText = txt;
+            }
+        }
+
+        function clearLocationSelection() {
+            document.querySelectorAll('.loc-cb').forEach(cb => {
+                cb.checked = false;
+                cb.disabled = false;
+            });
+            updateLocationUI();
+            updateRollupVisibility();
+        }
+
+        function createTileRow(name, type) {
+            const row = document.createElement('div');
+            row.className = 'tile-row';
+            row.draggable = true;
+            const handleHtml = `<div class="drag-handle-container"><i class="fa-solid fa-grip-vertical"></i></div>`;
+            let innerContent = `${handleHtml}<span class="tile-name">${name}</span>`;
+            const controls = document.createElement('div');
+            controls.className = 'tile-controls';
+
+            if (type === 'sort') {
+                controls.innerHTML = `<div class="toggle-mini"><div class="opt-mini active" onclick="this.parentElement.querySelectorAll('.opt-mini').forEach(el=>el.classList.remove('active'));this.classList.add('active')">Asc</div><div class="opt-mini" onclick="this.parentElement.querySelectorAll('.opt-mini').forEach(el=>el.classList.remove('active'));this.classList.add('active')">Desc</div></div>`;
+            }
+
+            const del = document.createElement('i');
+            del.className = 'fa-solid fa-trash-can del-mini';
+            del.onclick = () => {
+                document.querySelectorAll(`.${type}-sidebar-cb`).forEach(c => {
+                    if (c.parentElement.querySelector('span').innerText === name) c.checked = false;
+                });
+                type === 'sort' ? updateSortTiles() : updateColumnTiles();
+            };
+            controls.appendChild(del);
+            row.innerHTML = innerContent;
+            row.appendChild(controls);
+            row.addEventListener('dragstart', () => row.classList.add('dragging'));
+            row.addEventListener('dragend', () => {
+                row.classList.remove('dragging');
+                updateSelectedFiltersSummary();
+            });
+            return row;
+        }
+
+        function initDragArea(id) {
+            const container = document.getElementById(id);
+            if (!container) return;
+            container.addEventListener('dragover', e => {
+                e.preventDefault();
+                const draggable = document.querySelector('.dragging');
+                const afterElement = [...container.querySelectorAll('.tile-row:not(.dragging)')].reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = e.clientY - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) return {
+                        offset: offset,
+                        element: child
+                    };
+                    else return closest;
+                }, {
+                    offset: Number.NEGATIVE_INFINITY
+                }).element;
+                if (afterElement == null) container.appendChild(draggable);
+                else container.insertBefore(draggable, afterElement);
+            });
+        }
+
+        function updateSortTiles() {
+            const list = document.getElementById('sort-display-list');
+            const checked = Array.from(document.querySelectorAll('.sort-sidebar-cb:checked')).map(c => c.parentElement.querySelector('span').innerText);
+            const current = Array.from(list.querySelectorAll('.tile-name')).map(t => t.innerText);
+            current.forEach(name => {
+                if (!checked.includes(name)) list.querySelectorAll('.tile-row').forEach(r => {
+                    if (r.querySelector('.tile-name').innerText === name) r.remove();
+                })
+            });
+            checked.forEach(name => {
+                if (!current.includes(name)) list.appendChild(createTileRow(name, 'sort'));
+            });
+            updateSelectedFiltersSummary();
+        }
+
+        function updateColumnTiles() {
+            const list = document.getElementById('columns-display-list');
+            const checked = Array.from(document.querySelectorAll('.columns-sidebar-cb:checked')).map(c => c.parentElement.querySelector('span').innerText);
+            const current = Array.from(list.querySelectorAll('.tile-name')).map(t => t.innerText);
+
+            current.forEach(name => {
+                if (!checked.includes(name)) list.querySelectorAll('.tile-row').forEach(r => {
+                    if (r.querySelector('.tile-name').innerText === name) r.remove();
+                });
+            });
+
+            checked.forEach(name => {
+                if (!current.includes(name)) list.appendChild(createTileRow(name, 'columns'));
+            });
+
+            updateSelectedFiltersSummary();
+        }
+
+        function handleListSelection(el, type) {
+            const cb = el.querySelector('input');
+            cb.checked = !cb.checked;
+            if (type === 'sort') {
+                updateSortTiles();
+            } else if (type === 'columns') {
+                updateColumnTiles();
+            }
+        }
+
+        function handleCategorySelection(el, type) {
+            const cb = el.querySelector('input');
+            cb.checked = !cb.checked;
+            const name = el.querySelector('span').innerText;
+            if (cb.checked) {
+                if (!currentSelections[type].includes(name)) currentSelections[type].push(name);
+            } else {
+                currentSelections[type] = currentSelections[type].filter(i => i !== name);
+            }
+            updateCategoryTiles(type);
+            updateSelectedFiltersSummary();
+        }
+
+        function updateCategoryTiles(type) {
+            const display = document.getElementById('modern-' + type + '-display');
+            const checked = currentSelections[type];
+            if (checked.length === 0) {
+                const label = type === 'minor' ? 'SELECT MINOR CATEGORY' : 'SELECT MAJOR CATEGORY';
+                const tabTitle = type === 'minor' ? 'Select Minor Category' : 'Select Major Category';
+                display.innerHTML = `<div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('${type}', '${tabTitle}')"><span>${label}</span><i class="fa-solid fa-chevron-down"></i></div>`;
+            } else {
+                const selectedLabel = type === 'minor' ? 'Selected Minor Category' : 'Selected Major Category';
+                display.innerHTML = `<div style="width:100%"><div class="section-title" style="margin-bottom:6px;">${selectedLabel}</div><div class="modern-tile" style="cursor:pointer;" onclick="event.stopPropagation(); toggleSideTabWithState('${type}', 'Select ${type === 'minor' ? 'Minor' : 'Major'} Category')"><span>${checked.length > 1 ? checked[0] + '...' : checked[0]}</span><i class="fa-solid fa-xmark" onclick="event.stopPropagation(); currentSelections['${type}']=[];updateCategoryTiles('${type}');updateSelectedFiltersSummary()"></i></div></div>`;
+            }
+        }
+
+        function updateDateText(picker, targetId) {
+            if (!picker.value) return;
+            const parts = picker.value.split('-');
+            document.getElementById(targetId).value = `${parts[1]}/${parts[2]}/${parts[0]}`;
+            const s = document.getElementById('sidebar-start-text').value;
+            const e = document.getElementById('sidebar-end-text').value;
+            if (s && e) setDateSelection(s, e);
+        }
+
+        function setDateSelection(s, e) {
+            const txt = `${s} to ${e}`;
+            display = document.getElementById('modern-date-display');
+            display.innerHTML = `<div style="width:100%"><div class="section-title" style="margin-bottom:6px;">Selected Date</div><div class="modern-tile" style="cursor:pointer;" onclick="event.stopPropagation(); toggleSideTabWithState('date', 'Select Date')"><span>${txt}</span><i class="fa-solid fa-xmark" onclick="event.stopPropagation(); clearDateSelection()"></i></div></div>`;
+            document.getElementById('sum-date-value').innerText = txt;
+            document.getElementById('treeSideTab').classList.remove('expanded');
+        }
+
+        function clearDateSelection() {
+            document.getElementById('modern-date-display').innerHTML = '<div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState(\'date\', \'Select Date\')"><span>No Date Selected</span><i class="fa-solid fa-chevron-down"></i></div>';
+            document.getElementById('sum-date-value').innerText = 'No date selected';
+        }
+
+        function filterTree(v) {
+            const t = v.toLowerCase();
+            document.querySelectorAll('#locationTree .tree-item').forEach(i => {
+                const n = (i.getAttribute('data-name') || "").toLowerCase();
+                i.style.display = n.includes(t) ? "block" : "none";
+            });
+        }
+
+        function toggleTree(i, event) {
+            event.stopPropagation();
+            const ul = i.closest('.loc-tree-node').nextElementSibling;
+            if (ul) {
+                ul.classList.toggle('show');
+                i.classList.toggle('fa-caret-right');
+                i.classList.toggle('fa-caret-down');
+            }
+        }
+
+        function toggleNodeSelection(id) {
+            const cb = document.getElementById(id);
+            if (cb) {
+                cb.checked = !cb.checked;
+                cb.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function togglePanel() {
+            document.getElementById('rightPanel').classList.toggle('open');
+        }
+
+        const dateDataMocks = {
+            'Date': [{
+                name: '12/29/2025',
+                start: '12/29/2025',
+                end: '12/29/2025'
+            }],
+            'Week': [{
+                    name: 'W03 - 2026',
+                    range: '1/12/2026-1/18/2026',
+                    start: '2026-01-12',
+                    end: '2026-01-18'
+                },
+                {
+                    name: 'W02 - 2026',
+                    range: '1/5/2026-1/11/2026',
+                    start: '2026-01-05',
+                    end: '2026-01-11'
+                },
+                {
+                    name: 'W01 - 2026',
+                    range: '12/29/2025-1/4/2026',
+                    start: '12/29/2025',
+                    end: '1/4/2026'
+                }
+            ],
+            'Periods': [],
+            'PayPeriods': [],
+            'Year': []
+        };
+
+        function loadDateData(cat) {
+            const panel = document.getElementById('dateDataPanel');
+            panel.innerHTML = '';
+            if (!dateDataMocks[cat]) return;
+            dateDataMocks[cat].forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'data-item';
+                div.innerHTML = `<span>${item.name}</span><span style="color:#888; font-size:0.75rem;">${item.range || ''}</span>`;
+                div.onclick = () => setDateSelection(item.start, item.end);
+                panel.appendChild(div);
+            });
+        }
+
+        /* --- THEME DATA & LOGIC --- */
+        let savedThemes = [
+            { id: 1, name: 'Corporate Navy', config: { header: { bg: '#0e2442', fg: '#ffffff' }, subheader: { fg: '#1976d2' }, groupby: { bg: '#e3f2fd', fg: '#0e2442' }, body: { bg: '#ffffff', fg: '#333333' }, footer: { bg: '#0e2442', fg: '#ffffff' } }, isFavorite: true, isDefault: true, isSystemDefault: true },
+            { id: 2, name: 'Modern Emerald', config: { header: { bg: '#064e3b', fg: '#ffffff' }, subheader: { fg: '#059669' }, groupby: { bg: '#ecfdf5', fg: '#064e3b' }, body: { bg: '#ffffff', fg: '#333333' }, footer: { bg: '#064e3b', fg: '#ffffff' } }, isFavorite: false, isDefault: false, isSystemDefault: true },
+            { id: 3, name: 'SaaS Light', config: { header: { bg: '#f8fafc', fg: '#1e293b' }, subheader: { fg: '#475569' }, groupby: { bg: '#f1f5f9', fg: '#1e293b' }, body: { bg: '#ffffff', fg: '#333333' }, footer: { bg: '#f1f5f9', fg: '#475569' } }, isFavorite: false, isDefault: false, isSystemDefault: true },
+            { id: 4, name: 'Midnight Slate', config: { header: { bg: '#1e293b', fg: '#ffffff' }, subheader: { fg: '#94a3b8' }, groupby: { bg: '#f8fafc', fg: '#1e293b' }, body: { bg: '#ffffff', fg: '#333333' }, footer: { bg: '#1e293b', fg: '#ffffff' } }, isFavorite: false, isDefault: false, isSystemDefault: true },
+            { id: 5, name: 'Sunset Crimson', config: { header: { bg: '#7f1d1d', fg: '#ffffff' }, subheader: { fg: '#b91c1c' }, groupby: { bg: '#fef2f2', fg: '#7f1d1d' }, body: { bg: '#ffffff', fg: '#333333' }, footer: { bg: '#7f1d1d', fg: '#ffffff' } }, isFavorite: false, isDefault: false, isSystemDefault: true }
+        ];
+
+        function renderSavedThemes() {
+            const container = document.getElementById('themeSectionsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const defaultHeader = document.createElement('div');
+            defaultHeader.className = 'section-subheader-label';
+            defaultHeader.style.marginTop = '0';
+            defaultHeader.innerText = 'Default Themes';
+            container.appendChild(defaultHeader);
+
+            const defaultGrid = document.createElement('div');
+            defaultGrid.className = 'saved-themes-grid';
+            container.appendChild(defaultGrid);
+
+            const savedHeader = document.createElement('div');
+            savedHeader.className = 'section-subheader-label';
+            savedHeader.style.marginTop = '32px';
+            savedHeader.innerText = 'Saved Themes';
+            container.appendChild(savedHeader);
+
+            const savedGrid = document.createElement('div');
+            savedGrid.className = 'saved-themes-grid';
+            container.appendChild(savedGrid);
+
+            const systemThemes = savedThemes.filter(t => t.isSystemDefault);
+            const userThemes = savedThemes.filter(t => !t.isSystemDefault);
+
+            renderThemeCards(systemThemes, defaultGrid);
+            renderThemeCards(userThemes, savedGrid);
+        }
+
+        function renderThemeCards(themes, gridContainer) {
+            themes.forEach(t => {
+                const card = document.createElement('div');
+                card.className = `theme-card ${t.isFavorite ? 'favorite' : ''}`;
+
+                const btnClass = t.isDefault ? 'apply-active' : 'apply';
+                const btnText = t.isDefault ? 'Default' : 'Set as Default';
+                
+                const badgeClass = t.isSystemDefault ? 'badge-default' : 'badge-custom';
+                const badgeText = t.isSystemDefault ? 'DEFAULT' : 'CUSTOM';
+
+                const actionButtons = t.isSystemDefault ? `
+                    <button class="btn-theme-action ${btnClass}" onclick="setDefaultTheme(${t.id})">${btnText}</button>
+                    <button class="btn-theme-action" onclick="openThemePreview(${t.id})">View Theme</button>
+                ` : `
+                    <button class="btn-theme-action ${btnClass}" onclick="setDefaultTheme(${t.id})">${btnText}</button>
+                    <button class="btn-theme-action" onclick="openThemePreview(${t.id})">View Theme</button>
+                    <button class="btn-theme-action" onclick="openThemeDesigner(${t.id})">Edit</button>
+                    <button class="btn-theme-action delete" onclick="deleteTheme(${t.id})">Delete</button>
+                `;
+
+                card.innerHTML = `
+                    <div class="theme-card-header">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span class="theme-card-name">${t.name}</span>
+                            <span class="theme-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                        <i class="fa-star ${t.isFavorite ? 'fa-solid active' : 'fa-regular'} star-fav" onclick="toggleThemeFav(${t.id})"></i>
+                    </div>
+                    <div class="theme-preview-strip">
+                        <div class="preview-swatch" style="background:${t.config.header.bg}"></div>
+                        <div class="preview-swatch" style="background:${t.config.groupby.bg}"></div>
+                        <div class="preview-swatch" style="background:${t.config.body.bg}"></div>
+                    </div>
+                    <div class="theme-card-actions">
+                        ${actionButtons}
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function setDefaultTheme(id) {
+            // Update the data model
+            savedThemes.forEach(t => t.isDefault = (t.id === id));
+            
+            // Immediate Session Reflection:
+            // Synchronize the currently selected report theme to the new default
+            selectedReportThemeId = id;
+
+            // Refresh UI components
+            renderSavedThemes();
+            updateThemeUI();
+            
+            // If the sidebar is currently open, refresh it to show new badges
+            if (document.getElementById('treeSideTab').classList.contains('expanded')) {
+                populateThemeSidebar();
+            }
+        }
+
+        function toggleThemeFav(id) {
+            const t = savedThemes.find(x => x.id === id);
+            if (t) t.isFavorite = !t.isFavorite;
+            renderSavedThemes();
+        }
+
+        function deleteTheme(id) {
+            if (confirm("Are you sure you want to delete this theme?")) {
+                savedThemes = savedThemes.filter(x => x.id !== id);
+                renderSavedThemes();
+            }
+        }
+
+        let editingThemeId = null;
+
+        function openThemeDesigner(id = null) {
+            editingThemeId = id;
+            document.getElementById('themeDesignerModal').classList.add('active');
+            const nameInput = document.getElementById('themeNameInput');
+            if (id) {
+                const t = savedThemes.find(x => x.id === id);
+                nameInput.value = t.name;
+                const sections = ['header', 'subheader', 'groupby', 'body', 'footer'];
+                sections.forEach(s => {
+                    const row = document.querySelector(`tr[data-section="${s}"]`);
+                    const colors = row.querySelectorAll('input[type="color"]');
+                    if (s === 'subheader') {
+                        colors[0].value = t.config[s].fg;
+                    } else {
+                        colors[0].value = t.config[s].bg;
+                        colors[1].value = t.config[s].fg;
+                    }
+                });
+            } else {
+                nameInput.value = '';
+            }
+            updateThemePreview();
+        }
+
+        function closeThemeDesigner() {
+            document.getElementById('themeDesignerModal').classList.remove('active');
+        }
+
+        function saveNewTheme() {
+            const name = document.getElementById('themeNameInput').value;
+            if (!name) {
+                alert("Please enter a theme name");
+                return;
+            }
+
+            const getSectionColors = (section) => {
+                const row = document.querySelector(`tr[data-section="${section}"]`);
+                return row ? row.querySelectorAll('input[type="color"]') : [];
+            };
+
+            const config = {
+                header: { bg: getSectionColors('header')[0]?.value || '#0e2442', fg: getSectionColors('header')[1]?.value || '#ffffff' },
+                subheader: { fg: getSectionColors('subheader')[0]?.value || '#1976d2' },
+                groupby: { bg: getSectionColors('groupby')[0]?.value || '#e3f2fd', fg: getSectionColors('groupby')[1]?.value || '#0e2442' },
+                body: { bg: getSectionColors('body')[0]?.value || '#ffffff', fg: getSectionColors('body')[1]?.value || '#333333' },
+                footer: { bg: getSectionColors('footer')[0]?.value || '#0e2442', fg: getSectionColors('footer')[1]?.value || '#ffffff' }
+            };
+
+            if (editingThemeId) {
+                const idx = savedThemes.findIndex(x => x.id === editingThemeId);
+                if (idx !== -1) {
+                    savedThemes[idx].name = name;
+                    savedThemes[idx].config = config;
+                }
+            } else {
+                savedThemes.push({ id: Date.now(), name, config, isFavorite: false, isDefault: false, isSystemDefault: false });
+            }
+            closeThemeDesigner();
+            renderSavedThemes();
+        }
+
+        function updateThemePreview() {
+            const sections = ['header', 'subheader', 'groupby', 'body', 'footer'];
+            sections.forEach(s => {
+                const row = document.querySelector(`tr[data-section="${s}"]`);
+                if (!row) return;
+                const colors = row.querySelectorAll('input[type="color"]');
+                // Legacy logic cleaned if necessary
+            });
+        }
+
+        function openThemePreview(id) {
+            const theme = savedThemes.find(t => t.id === id);
+            if (!theme) return;
+            document.getElementById('previewThemeTitle').innerText = `${theme.name} - Sample Report Preview`;
+            const mock = theme.config;
+            
+            const mhHeader = document.getElementById('mh-header');
+            mhHeader.style.backgroundColor = mock.header.bg;
+            mhHeader.style.color = mock.header.fg;
+            const mhSubheader = document.getElementById('mh-subheader');
+            mhSubheader.style.color = mock.subheader.fg;
+            const mhGroupby = document.getElementById('mh-groupby');
+            mhGroupby.style.backgroundColor = mock.groupby.bg;
+            mhGroupby.style.color = mock.groupby.fg;
+            const mhBody1 = document.getElementById('mh-body-1');
+            const mhBody2 = document.getElementById('mh-body-2');
+            [mhBody1, mhBody2].forEach(row => { row.style.backgroundColor = mock.body.bg; row.style.color = mock.body.fg; });
+            const mhFooter = document.getElementById('mh-footer');
+            mhFooter.style.backgroundColor = mock.footer.bg;
+            mhFooter.style.color = mock.footer.fg;
+
+            const useBtn = document.getElementById('useThemeBtn');
+            useBtn.onclick = () => { updateSelectedTheme(theme.id); closeThemePreview(); };
+            document.getElementById('themePreviewModal').classList.add('active');
+        }
+
+        function closeThemePreview() { document.getElementById('themePreviewModal').classList.remove('active'); }
+
+        let selectedReportThemeId = null;
+
+        function updateSelectedTheme(id) { 
+            selectedReportThemeId = id; 
+            updateThemeUI();
+        }
+        
+        function updateThemeUI() {
+            const display = document.getElementById('modern-report-theme-display');
+            const theme = savedThemes.find(t => t.id == selectedReportThemeId);
+            if (!theme) {
+                display.innerHTML = `<div class="section-title" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%;" onclick="event.stopPropagation(); toggleSideTabWithState('reportTheme', 'Select Theme')"><span>SELECT THEME</span><i class="fa-solid fa-chevron-down"></i></div>`;
+            } else {
+                display.innerHTML = `<div style="width:100%"><div class="section-title" style="margin-bottom:6px;">Selected Theme</div><div class="modern-tile" style="cursor:pointer;" onclick="event.stopPropagation(); toggleSideTabWithState('reportTheme', 'Select Theme')"><span>${theme.name}</span><i class="fa-solid fa-xmark" onclick="event.stopPropagation(); selectedReportThemeId=null; updateThemeUI();"></i></div></div>`;
+            }
+        }
+
+        function populateThemeSidebar() {
+            const list = document.getElementById('themeSidebarContent');
+            list.innerHTML = '';
+            
+            // Sort logic: System first (Default > Favorite > Normal), then Custom (Alphabetical)
+            const sortedThemes = [...savedThemes].sort((a, b) => {
+                if (a.isSystemDefault !== b.isSystemDefault) return a.isSystemDefault ? -1 : 1;
+                if (a.isDefault && !b.isDefault) return -1;
+                if (!a.isDefault && b.isDefault) return 1;
+                if (a.isFavorite && !b.isFavorite) return -1;
+                if (!a.isFavorite && b.isFavorite) return 1;
+                return a.name.localeCompare(b.name);
+            });
+
+            sortedThemes.forEach(theme => {
+                const isSelected = theme.id == selectedReportThemeId;
+                const div = document.createElement('div');
+                
+                // Construct specialized classes for differentiation
+                let classes = 'sidebar-list-item';
+                if (theme.isDefault) classes += ' type-default';
+                else if (!theme.isSystemDefault) classes += ' type-custom';
+                if (isSelected) classes += ' selected';
+                
+                div.className = classes;
+
+                div.onclick = function() {
+                    updateSelectedTheme(theme.id);
+                    document.getElementById('treeSideTab').classList.remove('expanded');
+                };
+
+                const badgeHtml = theme.isDefault ? 
+                    `<span class="theme-badge badge-default" style="margin-left: 8px; vertical-align: middle;" title="System Default Theme">DEFAULT</span>` : '';
+                
+                const starHtml = theme.isFavorite ? 
+                    `<i class="fa-solid fa-star" style="color: #facc15; margin-left: auto; font-size: 0.8rem;" title="Marked as Favorite"></i>` : '';
+
+                div.innerHTML = `
+                    <div style="display:flex; align-items:center; width:100%;">
+                        <i class="fa-solid fa-palette" style="margin-right: 12px; font-size: 0.9rem; color: ${isSelected ? 'var(--primary-blue)' : '#9e9e9e'}"></i>
+                        <div style="display:flex; flex-direction:column; flex: 1;">
+                            <div style="display:flex; align-items:center; flex-wrap: nowrap;">
+                                <span style="${isSelected ? 'font-weight: bold; color: var(--primary-blue);' : 'font-weight: 500;'} white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${theme.name}</span>
+                                ${badgeHtml}
+                            </div>
+                            <span style="font-size: 0.6rem; color: #757575;">${theme.isSystemDefault ? 'System Theme' : 'Custom Theme'}</span>
+                        </div>
+                        ${starHtml}
+                        ${isSelected ? '<i class="fa-solid fa-check" style="color: var(--primary-blue); margin-left: 8px;"></i>' : ''}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        window.onload = function() {
+            renderReportTiles('reports');
+            initDragArea('sort-display-list');
+            initDragArea('columns-display-list');
+            
+            // Auto-select Default Theme on load
+            const defaultTheme = savedThemes.find(t => t.isDefault);
+            if (defaultTheme) {
+                selectedReportThemeId = defaultTheme.id;
+            }
+
+            renderSavedThemes();
+            updateThemeUI();
+        };
+
+        /**
+         * =========================================================================
+         * ADD-ON: REALISTIC LIVE REPORT PREVIEW (EMPLOYEE TIME LOSS REPORT)
+         * =========================================================================
+         */
+
+        (function initRealisticPreviewAddon() {
+            // 1. Inject Zebra striping row into the Theme Designer Table
+            const bodyRow = document.querySelector('tr[data-section="body"]');
+            if (bodyRow) {
+                const zebraRow = document.createElement('tr');
+                zebraRow.setAttribute('data-section', 'body-alt');
+                zebraRow.innerHTML = `
+                    <td style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="zebraEnabledCheckbox" checked onchange="updateThemePreview()" style="width: 14px; height: 14px; accent-color: var(--primary-blue);">
+                        <span>Alternate Rows</span>
+                    </td>
+                    <td>
+                        <div class="input-color-wrapper"><input type="color" id="altBgPicker" value="#fef2f2" class="input-color-refined" oninput="updateThemePreview()"></div>
+                    </td>
+                    <td>
+                        <div class="input-color-wrapper"><input type="color" id="altTextPicker" value="#333333" class="input-color-refined" oninput="updateThemePreview()"></div>
+                    </td>
+                `;
+                bodyRow.parentNode.insertBefore(zebraRow, bodyRow.nextSibling);
+            }
+
+            // 2. Inject the realistic Report Mockup structure into the designer card
+            const designerCard = document.querySelector('.designer-card');
+            if (designerCard) {
+                const existingLayout = designerCard.querySelector('div[style*="display: flex"]');
+                if (!existingLayout) {
+                    const layoutWrapper = document.createElement('div');
+                    layoutWrapper.className = 'designer-split-layout';
+                    
+                    const leftCol = document.createElement('div');
+                    leftCol.className = 'designer-config-column';
+                    while (designerCard.childNodes.length > 1) {
+                        if (designerCard.childNodes[1].className === 'theme-page-title') break;
+                        leftCol.appendChild(designerCard.childNodes[1]);
+                    }
+                    
+                    const rightCol = document.createElement('div');
+                    rightCol.className = 'designer-preview-column';
+                    rightCol.innerHTML = `
+                        <div class="section-title" style="margin-bottom: 12px; color: #64748b;">Live Report Preview</div>
+                        <div class="preview-report-mock" id="designer-live-mock">
+                            <div class="mock-header" id="dlm-header" style="text-align: center; justify-content: center;">
+                                <span>Employee Time Loss Report</span>
+                            </div>
+                            <div class="mock-subheader" id="dlm-subheader" style="text-align: center;">
+                                Sites: Famous Dave's Rancho #3096 | Date Range : 01/07/2026 to 01/07/2026
+                            </div>
+                            <table class="mock-table" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                                <thead id="dlm-table-head" style="background: #0e2442; color: #fff;">
+                                    <tr class="mock-th-row">
+                                        <th style="padding: 10px; text-align: left; width: 25%;">Emp Name</th>
+                                        <th style="padding: 10px; text-align: center; width: 25%;">Early In</th>
+                                        <th style="padding: 10px; text-align: center; width: 25%;">Early ($)</th>
+                                        <th style="padding: 10px; text-align: center; width: 25%;">Total Loss</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="mock-body-row" id="dlm-body-1">
+                                        <td style="padding: 10px; text-align: left;">Aaron Oravets</td>
+                                        <td style="padding: 10px; text-align: center;">0.01</td>
+                                        <td style="padding: 10px; text-align: center;">$0.19</td>
+                                        <td style="padding: 10px; text-align: center; font-weight:700;">$0.40</td>
+                                    </tr>
+                                    <tr class="mock-body-row" id="dlm-body-2">
+                                        <td style="padding: 10px; text-align: left;">Aaron Salazar</td>
+                                        <td style="padding: 10px; text-align: center;">0.01</td>
+                                        <td style="padding: 10px; text-align: center;">$0.19</td>
+                                        <td style="padding: 10px; text-align: center; font-weight:700;">$0.40</td>
+                                    </tr>
+                                    <tr class="mock-body-row" id="dlm-body-3">
+                                        <td style="padding: 10px; text-align: left;">Adrian Beltran</td>
+                                        <td style="padding: 10px; text-align: center;">0.01</td>
+                                        <td style="padding: 10px; text-align: center;">$0.19</td>
+                                        <td style="padding: 10px; text-align: center; font-weight:700;">$0.40</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mock-footer" id="dlm-footer" style="padding: 10px 20px;">Report Generated by Altametrics</div>
+                        </div>
+                    `;
+                    
+                    layoutWrapper.appendChild(leftCol);
+                    layoutWrapper.appendChild(rightCol);
+                    designerCard.appendChild(layoutWrapper);
+                }
+            }
+
+            // 3. Add CSS for bottom repositioning and alignment fix
+            const style = document.createElement('style');
+            style.innerHTML = `
+                /* REPOSITION TO BOTTOM */
+                .designer-split-layout {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 24px !important;
+                }
+                .designer-config-column, .designer-preview-column {
+                    width: 100% !important;
+                    flex: none !important;
+                }
+                .preview-report-mock {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+                .mock-header span { width: 100%; text-align: center; }
+
+                /* TABLE ALIGNMENT FIX */
+                .mock-table { 
+                    width: 100% !important; 
+                    table-layout: fixed !important;
+                    border-collapse: collapse !important;
+                    display: table !important;
+                }
+                .mock-th-row, .mock-body-row {
+                    display: table-row !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                }
+                .mock-th-row th, .mock-body-row td {
+                    display: table-cell !important;
+                    padding: 12px 10px !important;
+                    box-sizing: border-box !important;
+                    vertical-align: middle !important;
+                }
+                .mock-body-row {
+                    justify-content: unset !important; /* Override flex */
+                }
+            `;
+            document.head.appendChild(style);
+
+            // 4. Hook into existing functions to update the new Mockup
+            const originalUpdatePreview = updateThemePreview;
+            updateThemePreview = function() {
+                originalUpdatePreview();
+                
+                const headerBg = document.querySelector('tr[data-section="header"] input[type="color"]:nth-of-type(1)').value;
+                const headerFg = document.querySelectorAll('tr[data-section="header"] input[type="color"]')[1].value;
+                const subFg = document.querySelector('tr[data-section="subheader"] input[type="color"]').value;
+                const bodyBg = document.querySelector('tr[data-section="body"] input[type="color"]:nth-of-type(1)').value;
+                const bodyFg = document.querySelectorAll('tr[data-section="body"] input[type="color"]')[1].value;
+                const footerBg = document.querySelector('tr[data-section="footer"] input[type="color"]:nth-of-type(1)').value;
+                const footerFg = document.querySelectorAll('tr[data-section="footer"] input[type="color"]')[1].value;
+
+                const zebraEnabled = document.getElementById('zebraEnabledCheckbox').checked;
+                const altBg = document.getElementById('altBgPicker').value;
+                const altText = document.getElementById('altTextPicker').value;
+
+                const mHeader = document.getElementById('dlm-header');
+                const mSub = document.getElementById('dlm-subheader');
+                const mHead = document.getElementById('dlm-table-head');
+                const mFooter = document.getElementById('dlm-footer');
+                
+                if (mHeader) { mHeader.style.backgroundColor = headerBg; mHeader.style.color = headerFg; }
+                if (mSub) { mSub.style.color = subFg; }
+                if (mHead) { mHead.style.backgroundColor = headerBg; mHead.style.color = headerFg; }
+                if (mFooter) { mFooter.style.backgroundColor = footerBg; mFooter.style.color = footerFg; }
+
+                const b1 = document.getElementById('dlm-body-1');
+                const b2 = document.getElementById('dlm-body-2');
+                const b3 = document.getElementById('dlm-body-3');
+
+                if (b1) { b1.style.backgroundColor = bodyBg; b1.style.color = bodyFg; }
+                if (b2) {
+                    if (zebraEnabled) {
+                        b2.style.backgroundColor = altBg;
+                        b2.style.color = altText;
+                    } else {
+                        b2.style.backgroundColor = bodyBg;
+                        b2.style.color = bodyFg;
+                    }
+                }
+                if (b3) { b3.style.backgroundColor = bodyBg; b3.style.color = bodyFg; }
+            };
+
+            // 5. Ensure DOM move preview to bottom
+            window.movePreviewToBottom = function() {
+                const flexContainer = document.querySelector('.designer-split-layout');
+                if (flexContainer && flexContainer.children.length > 1) {
+                    flexContainer.appendChild(flexContainer.children[1]);
+                }
+            };
+
+            const originalOpenDesigner = openThemeDesigner;
+            openThemeDesigner = function(id = null) {
+                originalOpenDesigner(id);
+                const bodyLabel = document.querySelector('tr[data-section="body"] td:first-child');
+                if (bodyLabel) bodyLabel.innerText = "Table Body";
+
+                setTimeout(() => {
+                    movePreviewToBottom();
+                    updateThemePreview();
+                }, 0);
+            };
+
+            setTimeout(updateThemePreview, 500);
+
+        })();
+    </script>
+</body>
+</html>
